@@ -24,10 +24,11 @@ pipeline {
                 withSonarQubeEnv('sonarqube') {
                     dir('backend') {
                         sh '''
-                            mvn sonar:sonar \
-                            -Dsonar.projectKey=student-app2.0 \
-                            -Dsonar.projectName=student-app2.0
-                        '''
+                            mvn  sonar:sonar \
+  -Dsonar.projectKey=sonarqube \
+  -Dsonar.projectName='sonarqube' \
+  -Dsonar.host.url=http://13.60.180.10:9000 \
+  -Dsonar.token=sqp_58a0edcfa917f74f6d55fc113dff4838e4b86980
                     }
                 }
             }
