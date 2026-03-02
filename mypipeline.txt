@@ -5,7 +5,7 @@ pipeline {
 
         stage('PULL') {
             steps {
-                git 'https://github.com/chetanraval07/cdec-batch23.git'
+                git 'https://github.com/yash010103942/cdec-batch23.git'
                 echo 'Pull Success'
             }
         }
@@ -35,7 +35,7 @@ pipeline {
 
         stage('QUALITY GATE') {
             steps {
-                timeout(time: 10, unit: 'MINUTES') {
+                timeout(time: 5, unit: 'MINUTES') {
                     waitForQualityGate abortPipeline: true
                 }
             }
