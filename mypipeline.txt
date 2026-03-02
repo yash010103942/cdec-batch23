@@ -15,18 +15,18 @@ pipeline {
                 dir('backend') {
                     sh 'mvn clean package -DskipTests'
                 }
-		echo 'BUILD SUCCESS'
+                echo 'BUILD SUCCESS'
             }
         }
 
         stage('SONARQUBE ANALYSIS') {
             steps {
-                withSonarQubeEnv('sonarqube') {   // ✅ Use server NAME only
+                withSonarQubeEnv('sonarqube') {
                     dir('backend') {
                         sh '''
-                        mvn sonar:sonar \
-                        -Dsonar.projectKey=student-app2.0 \
-                        -Dsonar.projectName=student-app2.0
+                            mvn sonar:sonar \
+                            -Dsonar.projectKey=student-app2.0 \
+                            -Dsonar.projectName=student-app2.0
                         '''
                     }
                 }
@@ -42,11 +42,9 @@ pipeline {
         }
 
         stage('DEPLOY') {
-@q            steps {
+            steps {
                 echo 'Deploy Success'
             }
         }
     }
 }
-y
-
