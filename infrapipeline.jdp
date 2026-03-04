@@ -1,38 +1,38 @@
 pipeline {
     agent any
 
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-creds-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-creds-secret')
-    }
-
     stages {
 
-        stage('Git Pull') {
+        stage('PULL') {
             steps {
-                git 'https://github.com/chetanraval07/cdec-b23-infra.git'
+                git branch: 'main', 
+                    url: 'https://github.com/chetanraval07/cdec-b23-infra.git'
             }
         }
 
-        stage('Terraform Init') {
+        stage('INIT') {
             steps {
-                sh 'terraform init'
+                sh 'terraform init -reconfigure'
             }
         }
 
-        stage('Terraform Validate') {
-            steps {
-                sh 'terraform validate'
-            }
-        }
-
-        stage('Terraform Plan') {
+        stage('PLAN') {
             steps {
                 sh 'terraform plan'
             }
         }
 
-        stage('Terraform Apply') {
+        stage('APPROVAL') {
+            steps {
+                script {
+                    timeout(time: 30, unit: 'MINUTES') {
+                        input message: 'Approval is required. Shall we proceed?', ok: 'Approve'
+                    }
+                }
+            }
+        }
+
+        stage('APPLY') {
             steps {
                 sh 'terraform apply -auto-approve'
             }
