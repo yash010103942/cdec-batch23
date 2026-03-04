@@ -2,12 +2,13 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = "ap-south-1"
+        AWS_ACCESS_KEY_ID     = credentials('aws-creds-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-creds-secret')
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Git Pull') {
             steps {
                 git 'https://github.com/chetanraval07/cdec-b23-infra.git'
             }
@@ -16,6 +17,12 @@ pipeline {
         stage('Terraform Init') {
             steps {
                 sh 'terraform init'
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
             }
         }
 
