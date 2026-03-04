@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('PULL') {
+            steps {
+                   git 'https://github.com/chetanraval07/cdec-b23-infra.git'
+            }
+        }
+
+        stage('PLAN') {
+            steps {
+                sh '''
+                terraform init -reconfigure
+                terraform plan
+                '''
+            }
+        }
+
+        stage('APPROVAL') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input message: 'Approval is required. Shall we proceed?, OK : "Approve"'
+                }
+            }
+        }
+
+        stage('APPLY') {
+            steps {
+                sh '''
+                terraform apply --auto-approve
+                '''
+            }
+        }
+    }
+}
