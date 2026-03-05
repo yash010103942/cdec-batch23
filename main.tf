@@ -4,14 +4,14 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 6.0"
+      version = "~> 6.26"
     }
   }
 
   backend "s3" {
     bucket  = "my-jenkins-bucket020345"
-    key     = "eks/terraform.tfstate"
-    region  = "eu-north-1"   # ✅ Same region as provider
+    key     = "terraform.tfstate"
+    region  = "eu-north-1"
     encrypt = true
   }
 }
@@ -21,7 +21,7 @@ terraform {
 #################################
 
 provider "aws" {
-  region = "eu-north-1"   # ✅ Same region
+  region = "eu-north-1"
 }
 
 #################################
@@ -53,17 +53,19 @@ variable "cluster_name" {
 #################################
 
 resource "aws_iam_role" "eks_cluster_role" {
-  name = "eks-cluster-role-b23"
+  name = "eks-cluster-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "eks.amazonaws.com"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "eks.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
       }
-      Action = "sts:AssumeRole"
-    }]
+    ]
   })
 }
 
@@ -77,29 +79,32 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 #################################
 
 resource "aws_iam_role" "node_role" {
-  name = "eks-node-role-b23"
+  name = "eks-node-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Principal = {
-        Service = "ec2.amazonaws.com"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
       }
-      Action = "sts:AssumeRole"
-    }]
+    ]
   })
 }
 
 resource "aws_iam_role_policy_attachment" "node_policies" {
-  for_each = toset([
+  count = 3
+
+  role = aws_iam_role.node_role.name
+
+  policy_arn = element([
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  ])
-
-  role       = aws_iam_role.node_role.name
-  policy_arn = each.value
+  ], count.index)
 }
 
 #################################
@@ -129,13 +134,13 @@ resource "aws_eks_node_group" "nodegroup" {
   node_role_arn   = aws_iam_role.node_role.arn
   subnet_ids      = data.aws_subnets.default.ids
 
+  instance_types = ["t3.medium"]
+
   scaling_config {
     desired_size = 2
     min_size     = 1
     max_size     = 3
   }
-
-  instance_types = ["t3.medium"]
 
   depends_on = [
     aws_iam_role_policy_attachment.node_policies

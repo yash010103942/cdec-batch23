@@ -1,41 +1,41 @@
 pipeline {
-    agent any
+agent any
 
-    stages {
+```
+stages {
 
-        stage('PULL') {
-            steps {
-                git branch: 'main', 
-                    url: 'https://github.com/chetanraval07/cdec-b23-infra.git'
-            }
+    stage('PULL') {
+        steps {
+            git 'https://github.com/chetanraval07/cdec-b23-infra.git'
         }
+    }
 
-        stage('INIT') {
-            steps {
-                sh 'terraform init -reconfigure'
-            }
+    stage('PLAN') {
+        steps {
+            sh '''
+            terraform init -reconfigure
+            terraform plan
+            '''
         }
+    }
 
-        stage('PLAN') {
-            steps {
-                sh 'terraform plan'
-            }
-        }
-
-        stage('APPROVAL') {
-            steps {
-                script {
-                    timeout(time: 30, unit: 'MINUTES') {
-                        input message: 'Approval is required. Shall we proceed?', ok: 'Approve'
-                    }
-                }
-            }
-        }
-
-        stage('APPLY') {
-            steps {
-                sh 'terraform apply -auto-approve'
+    stage('APPROVAL') {
+        steps {
+            timeout(time: 30, unit: 'MINUTES') {
+                input message: 'Approval is required. Shall we proceed?', ok: 'Approve'
             }
         }
     }
+
+    stage('APPLY') {
+        steps {
+            sh '''
+            terraform apply -auto-approve
+            '''
+        }
+    }
+
+}
+```
+
 }
