@@ -1,41 +1,43 @@
 pipeline {
-agent any
+    agent any
 
-```
-stages {
-
-    stage('PULL') {
-        steps {
-            git 'https://github.com/chetanraval07/cdec-b23-infra.git'
-        }
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws-creds').username
+        AWS_SECRET_ACCESS_KEY = credentials('aws-creds').password
     }
 
-    stage('PLAN') {
-        steps {
-            sh '''
-            terraform init -reconfigure
-            terraform plan
-            '''
-        }
-    }
+    stages {
 
-    stage('APPROVAL') {
-        steps {
-            timeout(time: 30, unit: 'MINUTES') {
-                input message: 'Approval is required. Shall we proceed?', ok: 'Approve'
+        stage('PULL') {
+            steps {
+                git 'https://github.com/chetanraval07/cdec-b23-infra.git'
             }
         }
-    }
 
-    stage('APPLY') {
-        steps {
-            sh '''
-            terraform apply -auto-approve
-            '''
+        stage('PLAN') {
+            steps {
+                sh '''
+                terraform init -reconfigure
+                terraform plan
+                '''
+            }
         }
+
+        stage('APPROVAL') {
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    input message: 'Approval is required. Shall we proceed?', ok: 'Approve'
+                }
+            }
+        }
+
+        stage('APPLY') {
+            steps {
+                sh '''
+                terraform apply -auto-approve
+                '''
+            }
+        }
+
     }
-
-}
-```
-
 }
