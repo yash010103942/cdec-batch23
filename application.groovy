@@ -1,53 +1,37 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_USER = "yashkapse01"
+    }
+
     stages {
 
-        stage('PULL') {
+        stage('Clone Code') {
             steps {
-               git 'https://github.com/chetanraval07/jenkins-final26.git'
+                git 'https://github.com/chetanraval07/jenkins-final26.git'
             }
         }
 
-        stage('FRONTEND-DOCKER-BUILD') {
+        stage('Build Images') {
             steps {
-                sh '''
-                cd frontend
-                docker build -t yashkapse01/easy-frontend:latest .
-                '''
+                sh 'docker build -t yashkapse01/frontend ./frontend'
+                sh 'docker build -t yashkapse01/backend ./backend'
             }
         }
 
-        stage('BACKEND-DOCKER-BUILD') {
+        stage('Push Images') {
             steps {
-                sh '''
-                cd backend
-                docker build -t yashkapse01/easy-backend:latest .
-                '''
+                sh 'docker push yashkapse01/frontend'
+                sh 'docker push yashkapse01/backend'
             }
         }
 
-        stage('DOCKER-PUSH') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                docker push yashkapse01/easy-frontend:latest
-                docker push yashkapse01/easy-backend:latest
-                '''
-            }
-	}
-            stage('DOCKER-CLEAN') {
-            steps {
-                sh '''
-                docker rmi -f yashkapse01/easy-frontend:latest
-                docker rmi  -f yashkpase01/easy-backend:latest
-                '''
+                sh 'kubectl apply -f k8s/'
             }
         }
 
-        stage('DEPLOY') {
-            steps {
-                sh 'kubectl apply -f simple-deploy/'
-            }
-        }
     }
 }
