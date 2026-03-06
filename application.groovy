@@ -5,7 +5,7 @@ pipeline {
 
         stage('PULL') {
             steps {
-               git 'https://github.com/yash010103942/cdec-b23-infra.git'
+               git 'https://github.com/chetanraval07/jenkins-final26.git'
             }
         }
 
