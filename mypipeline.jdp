@@ -31,8 +31,10 @@ pipeline {
                         mvn clean verify sonar:sonar \
                         -Dsonar.projectKey=sonarqube \
                         -Dsonar.projectName=sonarqube \
-                        -Dsonar.host.url=http://13.51.162.75:9000 \
-                        -Dsonar.token=sqp_7109666d902321751c48c3dd6a6403afccf6b505
+                        -Dsonar.host.url=http://13.53.193.249:9000 \
+                        -Dsonar.token=sqa_0b2b66166068d74665aa7190ed1a427455ad48c0
+
+
                         '''
                     }
                 }
