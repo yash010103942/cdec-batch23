@@ -1,8 +1,8 @@
-xpipeline {
+pipeline {
     agent any
 
     tools {
-        maven 'Maven'   // Name configured in Global Tool Configuration
+        maven 'Maven'
     }
 
     stages {
@@ -28,18 +28,12 @@ xpipeline {
                 withSonarQubeEnv('sonarqube') {
                     dir('backend') {
                         sh '''
-                        mvn  clean  verify sonar:sonar \
-                         -Dsonar.projectKey=sonarqube \
-                         -Dsonar.projectName='sonarqube' \
-                         -Dsonar.host.url=http://13.51.162.75:9000 \
-                         -Dsonar.token=sqp_7109666d902321751c48c3dd6a6403afccf6b505
-                          
-                          
-                          
-                           
-                        
-                        
-                      
+                        mvn clean verify sonar:sonar \
+                        -Dsonar.projectKey=sonarqube \
+                        -Dsonar.projectName=sonarqube \
+                        -Dsonar.host.url=http://13.51.162.75:9000 \
+                        -Dsonar.token=sqp_7109666d902321751c48c3dd6a6403afccf6b505
+                        '''
                     }
                 }
             }
