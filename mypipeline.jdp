@@ -28,7 +28,7 @@ xpipeline {
                 withSonarQubeEnv('sonarqube') {
                     dir('backend') {
                         sh '''
-                        mvn  sonar:sonar \
+                        mvn  clean  verify sonar:sonar \
                          -Dsonar.projectKey=sonarqube \
                          -Dsonar.projectName='sonarqube' \
                          -Dsonar.host.url=http://13.51.162.75:9000 \
