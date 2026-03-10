@@ -29,10 +29,14 @@ xpipeline {
                     dir('backend') {
                         sh '''
                         mvn  sonar:sonar \
-                          -Dsonar.projectKey=sonarqube \
-                          -Dsonar.projectName='sonarqube' \
-                          -Dsonar.host.url=http://13.61.27.89:9000 \
-                           -Dsonar.token=sqp_96a053e2146c82ef5f0fa2cd90fe9ef31ea100e4
+                         -Dsonar.projectKey=sonarqube \
+                         -Dsonar.projectName='sonarqube' \
+                         -Dsonar.host.url=http://13.51.162.75:9000 \
+                         -Dsonar.token=sqp_7109666d902321751c48c3dd6a6403afccf6b505
+                          
+                          
+                          
+                           
                         
                         
                       
