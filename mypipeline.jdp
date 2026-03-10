@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven'   // Name configured in Global Tool Configuration
+    }
+
+    stages {
+
+        stage('PULL') {
+            steps {
+                git 'https://github.com/chetanraval07/cdec-batch23.git'
+                echo 'Pull SUCCESS'
+            }
+        }
+
+        stage('BUILD') {
+            steps {
+                dir('backend') {
+                    sh 'mvn clean package -DskipTests'
+                }
+                echo 'BUILD SUCCESSFUL'
+            }
+        }
+
+        stage('SONARQUBE ANALYSIS') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    dir('backend') {
+                        sh '''
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=student-app2.0 \
+                        -Dsonar.projectName=student-app2.0
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('QUALITY GATE') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('DELIVERY') {
+            steps {
+                dir('backend') {
+                    sh '''
+                    aws s3 cp target/student-registration-backend-0.0.1-SNAPSHOT.jar \
+                    s3://my-jenkins-bucket0203/studentapp.jar
+                    '''
+                }
+            }
+        }
+    }
+}
